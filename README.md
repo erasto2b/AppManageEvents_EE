@@ -1,6 +1,6 @@
 # AppManageEvents
 ## Aplicación de EventosManager para talento digital
-## numero 3
+## numero $
 
 - ##### Introducción *Presentación de equipo*  :
  - Cristopher Vergara
