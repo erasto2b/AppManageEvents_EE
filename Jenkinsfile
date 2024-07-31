@@ -78,5 +78,27 @@ pipeline {
                 docker images --filter "reference=registry.hub.docker.com/seiler18/mascachicles" --format "{{.ID}}" | tail -n +3 | xargs -r docker rmi -f
             '''
         }
+        success {
+            script {
+                def COLOR_MAP = [
+                    'SUCCESS': 'good',
+                    'FAILURE': 'danger',
+                ]
+                slackSend channel: '#time-tracker-ci',
+                           color: COLOR_MAP[currentBuild.currentResult],
+                           message: "*${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\nMore Info at: ${env.BUILD_URL}"
+            }
+        }
+        failure {
+            script {
+                def COLOR_MAP = [
+                    'SUCCESS': 'good',
+                    'FAILURE': 'danger',
+                ]
+                slackSend channel: '#time-tracker-ci',
+                           color: COLOR_MAP[currentBuild.currentResult],
+                           message: "*${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\nMore Info at: ${env.BUILD_URL}"
+            }
+        }
     }
 }
