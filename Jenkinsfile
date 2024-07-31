@@ -84,7 +84,7 @@ pipeline {
                     'SUCCESS': 'good',
                     'FAILURE': 'danger',
                 ]
-                slackSend channel: '#time-tracker-ci',
+                slackSend channel: '#aplicación-de-eventos',
                            color: COLOR_MAP[currentBuild.currentResult],
                            message: "*${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\nMore Info at: ${env.BUILD_URL}"
             }
@@ -95,7 +95,7 @@ pipeline {
                     'SUCCESS': 'good',
                     'FAILURE': 'danger',
                 ]
-                slackSend channel: '#time-tracker-ci',
+                slackSend channel: '#aplicación-de-eventos',
                            color: COLOR_MAP[currentBuild.currentResult],
                            message: "*${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\nMore Info at: ${env.BUILD_URL}"
             }
