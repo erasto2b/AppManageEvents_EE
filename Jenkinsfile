@@ -13,6 +13,8 @@ pipeline {
         VERSION = '0.0.1-RELEASE'
         PACKAGING = 'jar'
         FILE = 'target/appmanageevents-0.0.1-RELEASE.jar'
+        SLACK_CHANNEL = '#aplicación-de-eventos'
+        SLACK_CREDENTIALS = 'token_from_slack'
     }
 
     stages {
@@ -69,7 +71,22 @@ pipeline {
 
     post {
         always {
-            echo 'Pipeline completed'
+            echo 'Pipeline completado'
+            withCredentials([string(credentialsId: SLACK_CREDENTIALS, variable: 'token_from_slack')]) {
+                slackSend(channel: env.SLACK_CHANNEL, color: '#00FF00', message: "Pipeline completed: ${env.JOB_NAME} ${env.BUILD_NUMBER}", token: SLACK_TOKEN)
+            }
+        }
+        success {
+            echo 'Pipeline succeeded'
+            withCredentials([string(credentialsId: SLACK_CREDENTIALS, variable: 'token_from_slack')]) {
+                slackSend(channel: env.SLACK_CHANNEL, color: '#00FF00', message: "Pipeline succeeded: ${env.JOB_NAME} ${env.BUILD_NUMBER}", token: SLACK_TOKEN)
+            }
+        }
+        failure {
+            echo 'Pipeline fallo'
+            withCredentials([string(credentialsId: SLACK_CREDENTIALS, variable: 'token_from_slack')]) {
+                slackSend(channel: env.SLACK_CHANNEL, color: 'danger', message: "Pipeline failed: ${env.JOB_NAME} ${env.BUILD_NUMBER}", token: SLACK_TOKEN)
+            }
         }
         cleanup {
             echo 'Cleaning up old Docker images'
@@ -78,27 +95,6 @@ pipeline {
                 docker images --filter "reference=registry.hub.docker.com/seiler18/mascachicles" --format "{{.ID}}" | tail -n +3 | xargs -r docker rmi -f
             '''
         }
-        success {
-            script {
-                def COLOR_MAP = [
-                    'SUCCESS': 'good',
-                    'FAILURE': 'danger',
-                ]
-                slackSend channel: '#aplicación-de-eventos',
-                           color: COLOR_MAP[currentBuild.currentResult],
-                           message: "*${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\nMore Info at: ${env.BUILD_URL}"
-            }
-        }
-        failure {
-            script {
-                def COLOR_MAP = [
-                    'SUCCESS': 'good',
-                    'FAILURE': 'danger',
-                ]
-                slackSend channel: '#aplicación-de-eventos',
-                           color: COLOR_MAP[currentBuild.currentResult],
-                           message: "*${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\nMore Info at: ${env.BUILD_URL}"
-            }
-        }
     }
 }
+
