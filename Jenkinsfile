@@ -5,8 +5,8 @@ pipeline {
         GIT_CREDENTIALS = '80fb7680-e9da-48aa-80b6-d96387fbafec'
         DOCKER_HUB_CREDENTIALS = 'docker-hub-credentials'
         DOCKER_IMAGE_TAG = "seiler18/mascachicles:AppFinalRelease-${env.BUILD_NUMBER}"
-        SONARQUBE_SERVER = 'ProbandoSonar'
-        SONARQUBE_TOKEN = credentials('ProbandoSonar')
+        SONARQUBE_SERVER = 'SonaequebeServer'
+        SONARQUBE_TOKEN = credentials('SonarQube')
         NEXUS_CREDENTIALS = 'NexusLogin'
         GROUP_ID = 'cl.talentodigital'
         ARTIFACT_ID = 'appmanageevents'
