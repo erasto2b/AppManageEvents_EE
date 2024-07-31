@@ -2,19 +2,19 @@ pipeline {
     agent any
 
     environment {
-        GIT_CREDENTIALS = '80fb7680-e9da-48aa-80b6-d96387fbafec'
-        DOCKER_HUB_CREDENTIALS = 'docker-hub-credentials'
-        DOCKER_IMAGE_TAG = "seiler18/mascachicles:AppFinalRelease-${env.BUILD_NUMBER}"
-        SONARQUBE_SERVER = 'SonaequebeServer'
-        SONARQUBE_TOKEN = credentials('SonarQube')
-        NEXUS_CREDENTIALS = 'NexusLogin'
-        GROUP_ID = 'cl.talentodigital'
-        ARTIFACT_ID = 'appmanageevents'
-        VERSION = '0.0.1-RELEASE'
-        PACKAGING = 'jar'
-        FILE = 'target/appmanageevents-0.0.1-RELEASE.jar'
-        SLACK_CHANNEL = '#aplicación-de-eventos'
-        SLACK_TOKEN = 'token_from_slacl'
+        GIT_CREDENTIALS         = '80fb7680-e9da-48aa-80b6-d96387fbafec'
+        DOCKER_HUB_CREDENTIALS  = 'docker-hub-credentials'
+        DOCKER_IMAGE_TAG        = "seiler18/mascachicles:AppFinalRelease-${env.BUILD_NUMBER}"
+        SONARQUBE_SERVER        = 'SonaequebeServer'
+        SONARQUBE_TOKEN         = credentials('SonarQube')
+        NEXUS_CREDENTIALS       = 'NexusLogin'
+        GROUP_ID                = 'cl.talentodigital'
+        ARTIFACT_ID             = 'appmanageevents'
+        VERSION                 = '0.0.1-RELEASE'
+        PACKAGING               = 'jar'
+        FILE                    = 'target/appmanageevents-0.0.1-RELEASE.jar'
+        SLACK_CHANNEL           = '#aplicación-de-eventos'
+        SLACK_TOKEN             = 'token_from_slacl'
     }
 
     stages {
@@ -23,20 +23,28 @@ pipeline {
                 git url: 'https://github.com/seiler18/AppManageEvents', branch: 'main', credentialsId: GIT_CREDENTIALS
             }
         }
+
         stage('Build and Package with Maven') {
             steps {
                 sh './mvnw clean package -DskipTests'
             }
         }
+
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    withSonarQubeEnv(SONARQUBE_SERVER) {
-                        sh './mvnw sonar:sonar -Dsonar.token=${SONARQUBE_TOKEN}'
+                    def sonarRunner = tool name: 'SonarqubeScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                    withSonarQubeEnv('SonaequebeServer') {
+                        sh """
+                            ${sonarRunner}/bin/sonar-scanner \
+                            -Dsonar.projectKey=Projecto_jenkins \
+                            -Dsonar.java.binaries=target/classes
+                        """
                     }
                 }
             }
         }
+
         stage('Wait for Quality Gate') {
             steps {
                 timeout(time: 1, unit: 'MINUTES') {
@@ -44,6 +52,7 @@ pipeline {
                 }
             }
         }
+
         stage('Build Docker Image') {
             steps {
                 script {
@@ -54,13 +63,14 @@ pipeline {
                 }
             }
         }
+
         stage('Publish to Nexus') {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIALS, usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
                         configFileProvider([configFile(fileId: '554327cb-23d7-4efc-8cb0-1cce65e8b32e', variable: 'MAVEN_SETTINGS')]) {
                             sh """
-                            ./mvnw deploy -s ${MAVEN_SETTINGS} -DskipTests
+                                ./mvnw deploy -s ${MAVEN_SETTINGS} -DskipTests
                             """
                         }
                     }
