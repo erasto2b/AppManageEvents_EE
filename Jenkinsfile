@@ -14,7 +14,7 @@ pipeline {
         PACKAGING = 'jar'
         FILE = 'target/appmanageevents-0.0.1-RELEASE.jar'
         SLACK_CHANNEL = '#aplicación-de-eventos'
-        SLACK_TOKEN = 'vqvd5OYo1ZOJFoqInwKv4FMI'  // Token de Slack directo
+        SLACK_TOKEN = 'token_from_slacl'
     }
 
     stages {
