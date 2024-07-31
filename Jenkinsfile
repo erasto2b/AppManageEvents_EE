@@ -14,7 +14,7 @@ pipeline {
         PACKAGING = 'jar'
         FILE = 'target/appmanageevents-0.0.1-RELEASE.jar'
         SLACK_CHANNEL = '#aplicación-de-eventos'
-        SLACK_CREDENTIALS = 'token_from_slack'
+        SLACK_TOKEN = 'vqvd5OYo1ZOJFoqInwKv4FMI'  // Token de Slack directo
     }
 
     stages {
@@ -72,21 +72,15 @@ pipeline {
     post {
         always {
             echo 'Pipeline completado'
-            withCredentials([string(credentialsId: SLACK_CREDENTIALS, variable: 'token_from_slack')]) {
-                slackSend(channel: env.SLACK_CHANNEL, color: '#00FF00', message: "Pipeline completed: ${env.JOB_NAME} ${env.BUILD_NUMBER}", token: SLACK_TOKEN)
-            }
+            slackSend(channel: env.SLACK_CHANNEL, color: '#00FF00', message: "Pipeline completed: ${env.JOB_NAME} ${env.BUILD_NUMBER}", token: env.SLACK_TOKEN)
         }
         success {
             echo 'Pipeline succeeded'
-            withCredentials([string(credentialsId: SLACK_CREDENTIALS, variable: 'token_from_slack')]) {
-                slackSend(channel: env.SLACK_CHANNEL, color: '#00FF00', message: "Pipeline succeeded: ${env.JOB_NAME} ${env.BUILD_NUMBER}", token: SLACK_TOKEN)
-            }
+            slackSend(channel: env.SLACK_CHANNEL, color: '#00FF00', message: "Pipeline succeeded: ${env.JOB_NAME} ${env.BUILD_NUMBER}", token: env.SLACK_TOKEN)
         }
         failure {
-            echo 'Pipeline fallo'
-            withCredentials([string(credentialsId: SLACK_CREDENTIALS, variable: 'token_from_slack')]) {
-                slackSend(channel: env.SLACK_CHANNEL, color: 'danger', message: "Pipeline failed: ${env.JOB_NAME} ${env.BUILD_NUMBER}", token: SLACK_TOKEN)
-            }
+            echo 'Pipeline failed'
+            slackSend(channel: env.SLACK_CHANNEL, color: 'danger', message: "Pipeline failed: ${env.JOB_NAME} ${env.BUILD_NUMBER}", token: env.SLACK_TOKEN)
         }
         cleanup {
             echo 'Cleaning up old Docker images'
@@ -97,4 +91,3 @@ pipeline {
         }
     }
 }
-
